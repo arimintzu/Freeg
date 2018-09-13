@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,6 +23,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private Button btnCreate, btnLogin;
     private Username user;
+    private TextView btnForgot;
     boolean emailVerified;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     List<Username> listUser;
@@ -38,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        btnCreate = (Button) findViewById(R.id.btnCreate);
+        setAttribute();
+        /*--------------------------------------------
+        FUNGSI UNTUK REGISTER
+         */
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,16 +53,33 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+        /*--------------------------------------------*/
 
-        btnLogin = (Button) findViewById(R.id.btnLogin);
+
+        /*--------------------------------------------
+        FUNGSI UNTUK LOGIN
+         */
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onClickLogin();
             }
         });
+        /*--------------------------------------------*/
 
-        username = (EditText) findViewById(R.id.fieldUsername);
+        /*--------------------------------------------
+        FUNGSI UNTUK RESET PASSWORD
+         */
+        btnForgot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, Forgot.class);
+                startActivity(i);
+            }
+        });
+        /*--------------------------------------------*/
+
+
 
     }
 
@@ -114,6 +137,13 @@ public class MainActivity extends AppCompatActivity {
                         // ...
                     }
                 });
+    }
+
+    public void setAttribute() {
+        btnLogin = (Button) findViewById(R.id.btnLogin);
+        username = (EditText) findViewById(R.id.fieldUsername);
+        btnCreate = (Button) findViewById(R.id.btnCreate);
+        btnForgot = (TextView) findViewById(R.id.btnForgot);
     }
 
 }
