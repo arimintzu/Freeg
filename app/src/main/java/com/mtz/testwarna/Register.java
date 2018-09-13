@@ -37,12 +37,15 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.simbio.encryption.Encryption;
+
 public class Register extends AppCompatActivity {
     EditText username, password, email;
     Button btnCreate;
     Username data;
     List<Username> listUser;
     Username user;
+    private String encryptedPassword;
     private FirebaseAuth mAuth=FirebaseAuth.getInstance();
     boolean checkDatabase = true;
     boolean connected = false;
@@ -153,15 +156,21 @@ public class Register extends AppCompatActivity {
                 //Checking the index, if its still -1
                 //-1 here means EMPTY COMPARISON
                 if(indexOfList==-1) {
-                    mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                    String key = "YourKey";
+                    String salt = "YourSalt";
+                    byte[] iv = new byte[16];
+                    Encryption encryption = Encryption.getDefault(key, salt, iv);
+                    String encrypted = encryption.encryptOrNull(password.getText().toString());
+                    encryptedPassword=encrypted;
+                    Log.d("ENCRYPTED TEXT", encryptedPassword);
+                    mAuth.createUserWithEmailAndPassword(email.getText().toString(), encryptedPassword)
                             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        // Sign in success, update UI with the signed-in user's information
                                         String id = databaseUsername.push().getKey();
                                         data = new Username(username.getText().toString(),
-                                                password.getText().toString(), email.getText().toString());
+                                                encryptedPassword, email.getText().toString());
                                         databaseUsername.child(id).setValue(data);
                                         sendEmailVerification();
 
@@ -215,3 +224,12 @@ public class Register extends AppCompatActivity {
         btnCreate = (Button) findViewById(R.id.btnregCreate);
     }
 }
+
+/*
+String key = "YourKey";
+String salt = "YourSalt";
+byte[] iv = new byte[16];
+Encryption encryption = Encryption.getDefault(key, salt, iv);
+String encrypted = encryption.encryptOrNull("Text to be encrypt");
+String decrypted = encryption.decryptOrNull(encrypted);
+ */

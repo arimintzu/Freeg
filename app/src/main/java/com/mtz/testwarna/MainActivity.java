@@ -1,6 +1,7 @@
 package com.mtz.testwarna;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +30,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.simbio.encryption.Encryption;
+
 public class MainActivity extends AppCompatActivity {
     private Button btnCreate, btnLogin;
     private Username user;
@@ -36,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     boolean emailVerified;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     List<Username> listUser;
-    EditText username;
+    EditText username, password;
+    private SharedPreferences sp;
     final DatabaseReference database = FirebaseDatabase.getInstance().getReference("User");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
         /*--------------------------------------------
         FUNGSI UNTUK LOGIN
          */
+        sp = getSharedPreferences("login",MODE_PRIVATE);
+
+        if(sp.getBoolean("isLogged",false)){
+            Intent i = new Intent(MainActivity.this, Forgot.class);
+            startActivity(i);
+        }
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,19 +122,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void checkEmailAuth(Username user) {
-        Log.d("TAG", user.getEmail());
-        Log.d("AUTUH", mAuth.toString());
-        mAuth.signInWithEmailAndPassword(user.getEmail(), user.getPassword())
+    private void checkEmailAuth(final Username user) {
+        String key = "YourKey";
+        String salt = "YourSalt";
+        byte[] iv = new byte[16];
+        Encryption encryption = Encryption.getDefault(key, salt, iv);
+        String encrypted = encryption.encryptOrNull(password.getText().toString());
+        Log.d("ENCRYPTED TO FIREBASE", encrypted);
+        mAuth.signInWithEmailAndPassword(user.getEmail(), encrypted)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             FirebaseUser userver = mAuth.getCurrentUser();
                             if(userver.isEmailVerified()==false){
-                                Toast.makeText(getApplicationContext(), "ABelom di verif.",
+                                Toast.makeText(getApplicationContext(), "Belom di verif.",
                                         Toast.LENGTH_SHORT).show();
                             } else {
+                                sp.edit().putString("email",user.getEmail()).apply();
+                                sp.edit().putString("username",user.getUsername()).apply();
+                                sp.edit().putBoolean("isLogged",true).apply();
                                 Toast.makeText(getApplicationContext(), "Sudah di verif.",
                                         Toast.LENGTH_SHORT).show();
                             }
@@ -144,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
         username = (EditText) findViewById(R.id.fieldUsername);
         btnCreate = (Button) findViewById(R.id.btnCreate);
         btnForgot = (TextView) findViewById(R.id.btnForgot);
+        password = (EditText) findViewById(R.id.fieldPassword);
     }
 
 }

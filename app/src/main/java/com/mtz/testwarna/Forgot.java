@@ -15,6 +15,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
+import se.simbio.encryption.Encryption;
+
 public class Forgot extends AppCompatActivity {
 
     private EditText fieldEmail;
@@ -45,6 +47,7 @@ public class Forgot extends AppCompatActivity {
                                 }
                             }
                         });
+
             }
         });
         /*--------------------------------------------*/
@@ -59,6 +62,8 @@ public class Forgot extends AppCompatActivity {
     public void setAttribute() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.backbtn_reset);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         btnReset = (Button) findViewById(R.id.btnReset);
         fieldEmail = (EditText) findViewById(R.id.fieldReset_Email);
     }
