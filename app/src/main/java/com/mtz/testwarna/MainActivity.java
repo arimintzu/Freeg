@@ -105,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Sukses", Toast.LENGTH_LONG).show();
                         checkEmailAuth(user);
                         sukses=1;
+                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                        startActivity(intent);
                         break;
                     }
                 }

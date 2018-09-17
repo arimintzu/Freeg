@@ -7,6 +7,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface GiveawayApi {
@@ -23,4 +24,13 @@ public interface GiveawayApi {
                                     @Field("image") String image,
                                     @Field("participants") int participants,
                                     @Field("status") String status);
+
+    @PUT("giveaways/{giveaway_id}")
+    @FormUrlEncoded
+    Call<GiveawayValue> updateGiveaway(@Field("user_id") int user_id,
+                                       @Field("content") String content,
+                                       @Field("image") String image,
+                                       @Field("participants") int participants,
+                                       @Field("status") String status,
+                                       @Path("giveaway_id") int giveaway_id);
 }
